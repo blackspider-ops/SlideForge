@@ -1,4 +1,4 @@
-"""Convert between PDF and PPT formats."""
+"""Convert between PDF, PPT, and PNG formats."""
 
 import sys
 from pathlib import Path
@@ -240,4 +240,64 @@ def convert_ppt_to_pdf(ppt_path: str, output_path: str, quiet: bool = False):
         
     except Exception as e:
         print(f"Error converting PPT to PDF: {e}")
+        sys.exit(1)
+
+
+
+def convert_pdf_to_png(pdf_path: str, output_dir: str, quiet: bool = False):
+    """Convert PDF pages to PNG images (one PNG per page)."""
+    try:
+        from pdf2image import convert_from_path
+        import os
+    except ImportError:
+        print("Error: pdf2image not installed")
+        print("Install with: pip install pdf2image")
+        print("Note: Also requires poppler (brew install poppler on macOS)")
+        sys.exit(1)
+    
+    if not quiet:
+        print(f"Converting PDF to PNG images: {pdf_path}")
+    
+    try:
+        # Convert PDF pages to images
+        if not quiet:
+            print("  Converting PDF pages to images...")
+        images = convert_from_path(pdf_path, dpi=300)
+        
+        if not images:
+            print("Error: No pages found in PDF")
+            sys.exit(1)
+        
+        # Create output directory if it doesn't exist
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        # Get base filename from PDF
+        pdf_name = Path(pdf_path).stem
+        
+        if not quiet:
+            print(f"  Saving {len(images)} PNG images...")
+        
+        saved_files = []
+        for i, image in enumerate(images, 1):
+            # Save each page as PNG
+            png_filename = f"{pdf_name}_page{i}.png"
+            png_path = output_path / png_filename
+            image.save(str(png_path), 'PNG')
+            saved_files.append(png_path)
+            
+            if not quiet:
+                print(f"    Saved: {png_filename}")
+        
+        if not quiet:
+            print(f"\n✓ Created {len(saved_files)} PNG images in: {output_dir}")
+            print(f"  Files: {pdf_name}_page1.png to {pdf_name}_page{len(images)}.png")
+        
+        return saved_files
+        
+    except Exception as e:
+        print(f"Error converting PDF to PNG: {e}")
+        if "poppler" in str(e).lower():
+            print("\nNote: PDF to PNG conversion requires poppler")
+            print("Install with: brew install poppler (macOS)")
         sys.exit(1)

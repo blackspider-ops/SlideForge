@@ -172,6 +172,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for converting existing presentations
 - Flexible input/output workflows
 
+## [2.0.0] - 2024-11-25
+
+### Added
+- **PDF to PNG conversion** - `--convert-from pdf --input file.pdf --format png`
+- `-C` short alias for `--convert-from`
+- High-resolution PNG export (300 DPI)
+- Each PDF page becomes a separate PNG image
+- Automatic PNG file naming (filename_page1.png, filename_page2.png, etc.)
+
+### Fixed
+- HTML to PDF conversion now ensures each slide fits on one page
+- Optimized HTML slide layouts to prevent content overflow
+- Fixed multi-page PDF generation for tall content
+- Improved PPT to PDF conversion with better image extraction
+- Fixed blank PDF output in format conversion
+
+### Improved
+- Better handling of HTML content that exceeds 720px height
+- Reduced padding and margins in HTML templates for better fit
+- Enhanced format conversion reliability
+- More robust error handling in conversion workflows
+
+### Changed
+- Updated description to include PNG format support
+- Improved format conversion error messages
+
 ## [Unreleased]
 
 ### Planned

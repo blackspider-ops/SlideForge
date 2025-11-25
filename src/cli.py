@@ -40,21 +40,21 @@ Examples:
     parser.add_argument(
         'format_arg',
         nargs='?',
-        choices=['pdf', 'ppt'],
-        help='Output format: pdf or ppt (can be used without --format)'
+        choices=['pdf', 'ppt', 'png'],
+        help='Output format: pdf, ppt, or png (can be used without --format)'
     )
     
     parser.add_argument(
         '--format', '-f',
-        choices=['pdf', 'ppt'],
+        choices=['pdf', 'ppt', 'png'],
         required=False,
-        help='Output format: pdf or ppt'
+        help='Output format: pdf, ppt, or png'
     )
     
     parser.add_argument(
         '--convert-from', '-C',
         choices=['pdf', 'ppt'],
-        help='Convert from existing PDF or PPT file (use with --input)'
+        help='Convert from existing PDF or PPT file (use with --input and --format)'
     )
     
     parser.add_argument(
@@ -581,7 +581,7 @@ def run_converter():
             else:
                 sys.exit(1)
         
-        from converters.format_converter import convert_pdf_to_ppt, convert_ppt_to_pdf
+        from converters.format_converter import convert_pdf_to_ppt, convert_ppt_to_pdf, convert_pdf_to_png
         
         input_path = Path(args.input)
         if not input_path.exists():
@@ -606,10 +606,15 @@ def run_converter():
         # Convert
         if args.convert_from == 'pdf' and args.format == 'ppt':
             convert_pdf_to_ppt(str(input_path), str(output_path), args.quiet)
+        elif args.convert_from == 'pdf' and args.format == 'png':
+            # For PNG, output_path is the directory
+            output_dir = output_path.parent if args.output else output_dir
+            convert_pdf_to_png(str(input_path), str(output_dir), args.quiet)
         elif args.convert_from == 'ppt' and args.format == 'pdf':
             convert_ppt_to_pdf(str(input_path), str(output_path), args.quiet)
         else:
-            print(f"Error: Cannot convert {args.convert_from} to {args.format} (same format)")
+            print(f"Error: Cannot convert {args.convert_from} to {args.format}")
+            print("Supported conversions: PDF→PPT, PDF→PNG, PPT→PDF")
             sys.exit(1)
         
         sys.exit(0)

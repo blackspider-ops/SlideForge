@@ -3,7 +3,7 @@
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Forge your HTML slides into PowerPoint or PDF with perfect styling preservation. A production-ready CLI tool with automatic dependency management and robust error handling.
+Forge your HTML slides into PowerPoint, PDF, or PNG with perfect styling preservation. A production-ready CLI tool with automatic dependency management and robust error handling.
 
 ![Demo](https://via.placeholder.com/800x400/1D9BF0/ffffff?text=SlideForge)
 
@@ -33,7 +33,8 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 📎 **Merge PDFs** - Combine multiple PDF outputs
 - ⚡ **Parallel Processing** - Up to 4x faster with multi-threading
 - 🚀 **Scalable Workers** - Control parallel workers for optimal performance
-- 🔄 **Format Conversion** - Convert PDF ↔ PPT (NEW in v1.6.0!)
+- 🔄 **Format Conversion** - Convert PDF ↔ PPT ↔ PNG (NEW in v2.0.0!)
+- 🖼️ **PNG Export** - Export each PDF page as high-res PNG (300 DPI)
 
 ## 🚀 Quick Start
 
@@ -152,9 +153,15 @@ python converter.py --format pdf
 ./slideforge.sh pdf --parallel            # or -p
 ./slideforge.sh pdf -p --workers 8
 
-# Format conversion (NEW in v1.6.0!)
+# Format conversion (NEW in v2.0.0!)
 ./slideforge.sh --convert-from pdf --input presentation.pdf --format ppt
 ./slideforge.sh --convert-from ppt --input slides.pptx --format pdf -o output.pdf
+./slideforge.sh -C pdf -i slides.pdf -f png          # PDF to PNG (each page)
+
+# Short alias for format conversion
+./slideforge.sh -C pdf -i output/slides.pdf -f ppt   # PDF to PPT
+./slideforge.sh -C ppt -i output/slides.pptx -f pdf  # PPT to PDF
+./slideforge.sh -C pdf -i output/slides.pdf -f png   # PDF to PNG images
 ```
 
 **Windows:**
