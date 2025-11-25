@@ -216,6 +216,54 @@ def clean_slides_directory(slides_dir: str):
 
 def run_converter(args):
     """Run the converter with provided arguments."""
+    from version import __version__, __author__, __description__
+    
+    # Check if --version flag is present
+    if '--version' in args:
+        print(f"\nSlideForge v{__version__}")
+        print(f"{__description__}")
+        print(f"Author: {__author__}")
+        print(f"GitHub: https://github.com/blackspider-ops/SlideForge\n")
+        return
+    
+    # Check if --list flag is present
+    if '--list' in args:
+        # Get slides directory from args or use default
+        slides_dir = '../slides'
+        if '--slides-dir' in args:
+            idx = args.index('--slides-dir')
+            if idx + 1 < len(args):
+                slides_dir = args[idx + 1]
+        
+        # Resolve path relative to main.py location
+        script_dir = Path(__file__).parent
+        slides_path = (script_dir / slides_dir).resolve()
+        
+        # List slides
+        import glob
+        if not slides_path.exists():
+            print(f"Slides directory not found: {slides_path}")
+            return
+        
+        pattern = str(slides_path / "*.html")
+        html_files = sorted(glob.glob(pattern))
+        
+        if not html_files:
+            print(f"No HTML files found in {slides_path}")
+            return
+        
+        print(f"\n{'='*60}")
+        print(f"Found {len(html_files)} HTML slide(s) in {slides_path}")
+        print(f"{'='*60}\n")
+        
+        for i, file in enumerate(html_files, 1):
+            file_path = Path(file)
+            size = file_path.stat().st_size / 1024  # KB
+            print(f"  {i:2d}. {file_path.name:<30} ({size:.1f} KB)")
+        
+        print(f"\n{'='*60}\n")
+        return
+    
     # Check if --clean flag is present
     if '--clean' in args:
         # Get slides directory from args or use default

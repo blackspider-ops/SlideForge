@@ -4,6 +4,7 @@ import sys
 import argparse
 from pathlib import Path
 
+from version import __version__, __author__, __description__
 from utils.dependencies import check_and_install_dependencies
 from utils.file_utils import get_html_files, create_template_slide
 from converters import (
@@ -68,6 +69,30 @@ Examples:
         '--clean',
         action='store_true',
         help='Delete all HTML files in slides directory (requires confirmation)'
+    )
+    
+    parser.add_argument(
+        '--list',
+        action='store_true',
+        help='List all HTML slides in the slides directory'
+    )
+    
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Show what would be converted without actually converting'
+    )
+    
+    parser.add_argument(
+        '--version',
+        action='store_true',
+        help='Show version information'
+    )
+    
+    parser.add_argument(
+        '--range',
+        help='Convert only specific slides (e.g., 1-5 or 1,3,5)',
+        default=None
     )
     
     return parser.parse_args()
@@ -220,13 +245,84 @@ def clean_slides_directory(slides_dir: Path):
     print(f"{'='*60}\n")
 
 
+def show_version():
+    """Show version information."""
+    print(f"\nSlideForge v{__version__}")
+    print(f"{__description__}")
+    print(f"Author: {__author__}")
+    print(f"GitHub: https://github.com/blackspider-ops/SlideForge\n")
+
+
+def list_slides(slides_dir: Path):
+    """List all HTML slides in the directory."""
+    if not slides_dir.exists():
+        print(f"Slides directory not found: {slides_dir}")
+        return
+    
+    html_files = get_html_files(str(slides_dir))
+    
+    if not html_files:
+        print(f"No HTML files found in {slides_dir}")
+        return
+    
+    print(f"\n{'='*60}")
+    print(f"Found {len(html_files)} HTML slide(s) in {slides_dir}")
+    print(f"{'='*60}\n")
+    
+    for i, file in enumerate(html_files, 1):
+        size = file.stat().st_size / 1024  # KB
+        print(f"  {i:2d}. {file.name:<30} ({size:.1f} KB)")
+    
+    print(f"\n{'='*60}\n")
+
+
+def parse_range(range_str: str, total_slides: int) -> list:
+    """Parse range string into list of indices."""
+    indices = []
+    
+    try:
+        # Handle comma-separated values: 1,3,5
+        if ',' in range_str:
+            for part in range_str.split(','):
+                idx = int(part.strip()) - 1  # Convert to 0-based
+                if 0 <= idx < total_slides:
+                    indices.append(idx)
+        # Handle range: 1-5
+        elif '-' in range_str:
+            start, end = range_str.split('-')
+            start_idx = int(start.strip()) - 1
+            end_idx = int(end.strip())
+            indices = list(range(max(0, start_idx), min(end_idx, total_slides)))
+        # Handle single number: 3
+        else:
+            idx = int(range_str.strip()) - 1
+            if 0 <= idx < total_slides:
+                indices.append(idx)
+    except ValueError:
+        print(f"Invalid range format: {range_str}")
+        print("Use formats like: 1-5, 1,3,5, or 3")
+        sys.exit(1)
+    
+    return indices
+
+
 def run_converter():
     """Main converter logic."""
     args = parse_arguments()
     
+    # Handle version command
+    if args.version:
+        show_version()
+        sys.exit(0)
+    
     # Get script directory
     script_dir = Path(__file__).parent
     slides_dir = (script_dir / args.slides_dir).resolve()
+    
+    # Handle list command
+    if args.list:
+        list_slides(slides_dir)
+        sys.exit(0)
     
     # Handle clean command
     if args.clean:
@@ -245,8 +341,37 @@ def run_converter():
         handle_missing_slides(slides_dir)
     
     # Get HTML files
-    html_files = get_html_files(str(slides_dir))
-    print(f"Found {len(html_files)} HTML slides")
+    all_html_files = get_html_files(str(slides_dir))
+    
+    # Handle range selection
+    if args.range:
+        indices = parse_range(args.range, len(all_html_files))
+        if not indices:
+            print("No valid slides in specified range")
+            sys.exit(1)
+        html_files = [all_html_files[i] for i in indices]
+        print(f"Selected {len(html_files)} of {len(all_html_files)} slides (range: {args.range})")
+    else:
+        html_files = all_html_files
+        print(f"Found {len(html_files)} HTML slides")
+    
+    # Handle dry run
+    if args.dry_run:
+        print(f"\n{'='*60}")
+        print("DRY RUN - No files will be created")
+        print(f"{'='*60}\n")
+        print(f"Would convert {len(html_files)} slide(s):")
+        for i, file in enumerate(html_files, 1):
+            print(f"  {i}. {file.name}")
+        print(f"\nOutput format: {args.format.upper()}")
+        print(f"Method: {args.method}")
+        print(f"Output directory: {output_dir}")
+        if args.output:
+            print(f"Output filename: {args.output}")
+        print(f"\n{'='*60}")
+        print("Run without --dry-run to perform actual conversion")
+        print(f"{'='*60}\n")
+        sys.exit(0)
     
     # Create output directory if it doesn't exist
     try:

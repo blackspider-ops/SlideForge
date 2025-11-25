@@ -20,6 +20,10 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 🔢 **Smart Sorting** - Correctly orders slides numerically (page1, page2... page10)
 - 🖥️ **Cross-Platform** - Works on macOS, Linux, and Windows with simple launchers
 - 🗑️ **Clean Command** - Safely delete all slides with double confirmation for fresh start
+- 📋 **List Slides** - Preview all slides before converting
+- 🎯 **Range Selection** - Convert only specific slides (e.g., 1-5 or 1,3,5)
+- 🔍 **Dry Run** - Preview conversion without creating files
+- 📌 **Version Info** - Check current version with `--version`
 
 ## 🚀 Quick Start
 
@@ -97,8 +101,21 @@ python converter.py --format pdf
 # Use WeasyPrint method
 ./slideforge.sh --format pdf --method weasyprint
 
+# List all slides
+./slideforge.sh --list
+
+# Dry run (preview without converting)
+./slideforge.sh --format pdf --dry-run
+
+# Convert specific slides only
+./slideforge.sh --format pdf --range 1-5
+./slideforge.sh --format ppt --range 1,3,5,7
+
 # Clean slides directory (delete all HTML files)
 ./slideforge.sh --clean
+
+# Show version
+./slideforge.sh --version
 ```
 
 **Windows:**
@@ -112,8 +129,21 @@ slideforge.bat --format ppt
 # Use WeasyPrint method
 slideforge.bat --format pdf --method weasyprint
 
+# List all slides
+slideforge.bat --list
+
+# Dry run (preview without converting)
+slideforge.bat --format pdf --dry-run
+
+# Convert specific slides only
+slideforge.bat --format pdf --range 1-5
+slideforge.bat --format ppt --range 1,3,5,7
+
 # Clean slides directory (delete all HTML files)
 slideforge.bat --clean
+
+# Show version
+slideforge.bat --version
 ```
 
 

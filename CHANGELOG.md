@@ -36,6 +36,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 30-second timeout per slide
 - Keyboard interrupt handling
 
+## [1.3.0] - 2024-11-24
+
+### Added
+- `--version` flag to show version information
+- `--list` command to preview all slides before converting
+- `--dry-run` flag to preview conversion without creating files
+- `--range` option to convert specific slides (e.g., 1-5 or 1,3,5)
+- Version module (`src/version.py`) for centralized version management
+- Range parsing with support for ranges (1-5) and comma-separated values (1,3,5)
+
+### Improved
+- Better workflow with preview and dry-run capabilities
+- More control over which slides to convert
+- Enhanced user experience with list and version commands
+
 ## [1.2.0] - 2024-11-24
 
 ### Added
