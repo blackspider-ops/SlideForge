@@ -25,6 +25,26 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 git clone https://github.com/blackspider-ops/SlideForge.git
 cd SlideForge
 
+# Run SlideForge
+# macOS/Linux:
+./slideforge.sh --format pdf
+
+# Windows:
+slideforge.bat --format pdf
+
+# Or use Python directly (works everywhere):
+python slideforge.py --format pdf
+```
+
+That's it! The launcher will:
+- ✅ Check Python version
+- ✅ Create virtual environment automatically
+- ✅ Install dependencies if needed
+- ✅ Run the converter
+
+### Alternative: Direct Usage
+
+```bash
 # Navigate to src folder
 cd src
 
@@ -32,43 +52,70 @@ cd src
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Run the converter (dependencies auto-install)
+# Run the converter
 python converter.py --format pdf
 ```
-
-That's it! The script will guide you through the rest.
 
 ## 📖 Usage
 
 ### Basic Commands
 
+**macOS/Linux:**
 ```bash
 # Convert to PDF (uses Playwright by default)
-python converter.py --format pdf
+./slideforge.sh --format pdf
 
 # Convert to PowerPoint
-python converter.py --format ppt
+./slideforge.sh --format ppt
 
 # Use WeasyPrint method
-python converter.py --format pdf --method weasyprint
+./slideforge.sh --format pdf --method weasyprint
+```
+
+**Windows:**
+```cmd
+# Convert to PDF (uses Playwright by default)
+slideforge.bat --format pdf
+
+# Convert to PowerPoint
+slideforge.bat --format ppt
+
+# Use WeasyPrint method
+slideforge.bat --format pdf --method weasyprint
+```
+
+**Cross-platform (Python):**
+```bash
+python slideforge.py --format pdf
+python slideforge.py --format ppt
 ```
 
 ### Custom Output
 
+**macOS/Linux:**
 ```bash
-# Short form
-python converter.py --format pdf -o presentation
+./slideforge.sh --format pdf -o presentation
+./slideforge.sh --format ppt --output my-slides.pptx
+```
 
-# Long form
-python converter.py --format ppt --output my-slides.pptx
+**Windows:**
+```cmd
+slideforge.bat --format pdf -o presentation
+slideforge.bat --format ppt --output my-slides.pptx
 ```
 
 ### Custom Directories
 
+**macOS/Linux:**
 ```bash
-python converter.py --format ppt \
+./slideforge.sh --format ppt \
   --slides-dir ./my-slides \
   --output-dir ./exports
+```
+
+**Windows:**
+```cmd
+slideforge.bat --format ppt --slides-dir ./my-slides --output-dir ./exports
 ```
 
 ## 📋 Requirements
@@ -117,6 +164,17 @@ brew install poppler  # macOS only, for PPT conversion
 | Pure Python | ❌ | ✅ |
 
 **Recommendation:** Use Playwright for production-quality conversions.
+
+## Tips for Best Results
+
+1. **Use Playwright** for production-quality conversions
+2. **Test with one slide first** before converting large presentations
+3. **Keep HTML files simple** for better compatibility
+4. **Use web-safe fonts** or include font files locally
+5. **Optimize images** in HTML for faster processing
+6. **Check output** after conversion to ensure quality
+7. **Use templates** as starting points for consistent styling
+
 
 ## 🏗️ Project Structure
 
