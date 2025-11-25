@@ -54,8 +54,8 @@ Examples:
     parser.add_argument(
         '--method', '-m',
         choices=['playwright', 'weasyprint'],
-        default='playwright',
-        help='Conversion method (default: playwright)'
+        default=None,  # None means not specified, will use config or fallback
+        help='Conversion method (default: playwright or from config)'
     )
     
     parser.add_argument(
@@ -489,12 +489,12 @@ def run_converter():
     # Load config and apply defaults
     config = load_config()
     
-    # Apply config defaults if args not provided
-    if not hasattr(args, 'method') or args.method == 'playwright':
+    # Apply config defaults ONLY if args not explicitly provided
+    if args.method is None:
         args.method = config.get('method', 'playwright')
-    if not hasattr(args, 'slides_dir') or args.slides_dir == '../slides':
+    if args.slides_dir == '../slides':
         args.slides_dir = config.get('slides_dir', '../slides')
-    if not hasattr(args, 'output_dir') or args.output_dir == '../output':
+    if args.output_dir == '../output':
         args.output_dir = config.get('output_dir', '../output')
     
     # Handle show-config command
@@ -529,18 +529,22 @@ def run_converter():
         clean_slides_directory(slides_dir)
         sys.exit(0)
     
+    # Validate format requirement (after smart detection)
+    if not args.format and not args.batch:
+        print("Error: Format is required. Use: pdf, ppt, --format pdf, or --batch")
+        print("Examples:")
+        print("  ./slideforge.sh pdf")
+        print("  ./slideforge.sh --format ppt")
+        print("  ./slideforge.sh --batch")
+        sys.exit(1)
+    
     # Handle watch mode
     if args.watch:
         if not args.format:
-            print("Error: --watch requires --format")
+            print("Error: --watch requires a format")
             sys.exit(1)
         watch_directory(slides_dir, args)
         sys.exit(0)
-    
-    # Validate format requirement
-    if not args.format and not args.batch:
-        print("Error: --format is required (unless using --batch)")
-        sys.exit(1)
     
     # Handle batch mode
     if args.batch:

@@ -120,6 +120,9 @@ def convert_to_ppt_playwright(html_files: List[Path], output_path: str):
                     page.goto(f"file://{html_file.absolute()}", timeout=30000)
                     page.wait_for_load_state('networkidle', timeout=30000)
                     
+                    # Wait a bit for fonts to load
+                    page.wait_for_timeout(500)
+                    
                     # Take screenshot
                     screenshot = page.screenshot()
                     
