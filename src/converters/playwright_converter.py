@@ -41,6 +41,12 @@ def convert_to_pdf_playwright(html_files: List[Path], output_path: str, quiet: b
                     page.goto(f"file://{html_file.absolute()}", timeout=30000)
                     page.wait_for_load_state('networkidle', timeout=30000)
                     
+                    # Wait for fonts and icons to load
+                    page.wait_for_timeout(2000)
+                    
+                    # Wait for document to be ready
+                    page.evaluate("() => document.fonts.ready")
+                    
                     # Create temp PDF for this slide
                     temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
                     page.pdf(path=temp_pdf.name, width='1280px', height='720px', print_background=True)

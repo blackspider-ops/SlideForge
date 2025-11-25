@@ -47,6 +47,11 @@ def check_and_install_dependencies(method: str, format: str) -> bool:
     except ImportError:
         missing_packages.append("PyPDF2")
     
+    try:
+        import reportlab
+    except ImportError:
+        missing_packages.append("reportlab")
+    
     # Check method-specific dependencies
     if method == "playwright":
         try:

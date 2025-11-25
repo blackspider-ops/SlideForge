@@ -52,6 +52,18 @@ Examples:
     )
     
     parser.add_argument(
+        '--convert-from', '-C',
+        choices=['pdf', 'ppt'],
+        help='Convert from existing PDF or PPT file (use with --input)'
+    )
+    
+    parser.add_argument(
+        '--input', '-i',
+        help='Input file for format conversion (PDF or PPT)',
+        default=None
+    )
+    
+    parser.add_argument(
         '--method', '-m',
         choices=['playwright', 'weasyprint'],
         default=None,  # None means not specified, will use config or fallback
@@ -527,6 +539,79 @@ def run_converter():
     # Handle clean command
     if args.clean:
         clean_slides_directory(slides_dir)
+        sys.exit(0)
+    
+    # Handle format conversion (PDF ↔ PPT)
+    if args.convert_from:
+        if not args.input:
+            print("Error: --convert-from requires --input file")
+            sys.exit(1)
+        
+        if not args.format:
+            print("Error: --convert-from requires --format (target format)")
+            sys.exit(1)
+        
+        # Check format conversion dependencies
+        missing = []
+        try:
+            import reportlab
+        except ImportError:
+            missing.append("reportlab")
+        
+        if args.convert_from == 'pdf':
+            try:
+                import pdf2image
+            except ImportError:
+                missing.append("pdf2image")
+        
+        if missing:
+            print(f"\n{'='*60}")
+            print("Missing dependencies for format conversion!")
+            print(f"{'='*60}\n")
+            for pkg in missing:
+                print(f"  - {pkg}")
+            print(f"\n{'='*60}")
+            response = input("Install missing dependencies? (y/n): ").strip().lower()
+            if response == 'y':
+                import subprocess
+                for pkg in missing:
+                    print(f"Installing {pkg}...")
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", pkg])
+                print("✓ Dependencies installed!\n")
+            else:
+                sys.exit(1)
+        
+        from converters.format_converter import convert_pdf_to_ppt, convert_ppt_to_pdf
+        
+        input_path = Path(args.input)
+        if not input_path.exists():
+            print(f"Error: Input file not found: {input_path}")
+            sys.exit(1)
+        
+        # Determine output path
+        output_dir = (script_dir / args.output_dir).resolve()
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        if args.output:
+            output_filename = args.output
+            ext = '.pptx' if args.format == 'ppt' else '.pdf'
+            if not output_filename.lower().endswith(ext):
+                output_filename += ext
+        else:
+            ext = '.pptx' if args.format == 'ppt' else '.pdf'
+            output_filename = input_path.stem + '_converted' + ext
+        
+        output_path = output_dir / output_filename
+        
+        # Convert
+        if args.convert_from == 'pdf' and args.format == 'ppt':
+            convert_pdf_to_ppt(str(input_path), str(output_path), args.quiet)
+        elif args.convert_from == 'ppt' and args.format == 'pdf':
+            convert_ppt_to_pdf(str(input_path), str(output_path), args.quiet)
+        else:
+            print(f"Error: Cannot convert {args.convert_from} to {args.format} (same format)")
+            sys.exit(1)
+        
         sys.exit(0)
     
     # Validate format requirement (after smart detection)

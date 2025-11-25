@@ -158,6 +158,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Faster typing with short aliases
 - More intuitive usage
 
+## [1.6.0] - 2024-11-24
+
+### Added
+- **PDF to PPT conversion** - `--convert-from pdf --input file.pdf --format ppt`
+- **PPT to PDF conversion** - `--convert-from ppt --input file.pptx --format pdf`
+- `--input` / `-i` flag for specifying input files
+- Format converter module for file format conversions
+- LibreOffice integration for high-quality PPT to PDF (optional)
+
+### Improved
+- Extended SlideForge beyond HTML conversion
+- Support for converting existing presentations
+- Flexible input/output workflows
+
 ## [Unreleased]
 
 ### Planned

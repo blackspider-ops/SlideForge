@@ -33,6 +33,7 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 📎 **Merge PDFs** - Combine multiple PDF outputs
 - ⚡ **Parallel Processing** - Up to 4x faster with multi-threading
 - 🚀 **Scalable Workers** - Control parallel workers for optimal performance
+- 🔄 **Format Conversion** - Convert PDF ↔ PPT (NEW in v1.6.0!)
 
 ## 🚀 Quick Start
 
@@ -150,6 +151,10 @@ python converter.py --format pdf
 # Parallel processing (faster)
 ./slideforge.sh pdf --parallel            # or -p
 ./slideforge.sh pdf -p --workers 8
+
+# Format conversion (NEW in v1.6.0!)
+./slideforge.sh --convert-from pdf --input presentation.pdf --format ppt
+./slideforge.sh --convert-from ppt --input slides.pptx --format pdf -o output.pdf
 ```
 
 **Windows:**
