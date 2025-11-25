@@ -31,6 +31,8 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 👀 **Watch Mode** - Auto-convert when files change
 - 📏 **Custom Dimensions** - Override default slide size
 - 📎 **Merge PDFs** - Combine multiple PDF outputs
+- ⚡ **Parallel Processing** - Up to 4x faster with multi-threading
+- 🚀 **Scalable Workers** - Control parallel workers for optimal performance
 
 ## 🚀 Quick Start
 
@@ -143,6 +145,10 @@ python converter.py --format pdf
 
 # Custom dimensions
 ./slideforge.sh --format pdf --dimensions 1920x1080
+
+# Parallel processing (faster for many slides)
+./slideforge.sh --format pdf --parallel
+./slideforge.sh --format pdf --parallel --workers 8
 ```
 
 **Windows:**

@@ -114,10 +114,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added optional: tqdm (progress bars)
 - Added optional: watchdog (watch mode)
 
+## [1.5.0] - 2024-11-24
+
+### Added
+- **Parallel processing** - `--parallel` flag for faster conversions
+- `--workers N` - Control number of parallel workers (default: 4)
+- Multi-threaded conversion for Playwright method
+- Progress bars with tqdm during parallel conversion
+- Automatic temp file cleanup
+
+### Improved
+- Significantly faster conversion for large slide decks
+- Better resource utilization with parallel workers
+- Real-time progress tracking
+
+### Performance
+- Up to 4x faster conversion with 4 workers
+- Scales with number of CPU cores
+
 ## [Unreleased]
 
 ### Planned
-- Parallel processing for faster conversions
 - Docker support
 - GitHub Actions workflow
 - Unit tests

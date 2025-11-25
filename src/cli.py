@@ -146,6 +146,19 @@ Examples:
         default=None
     )
     
+    parser.add_argument(
+        '--parallel',
+        action='store_true',
+        help='Use parallel processing for faster conversion (experimental)'
+    )
+    
+    parser.add_argument(
+        '--workers',
+        type=int,
+        default=4,
+        help='Number of parallel workers (default: 4)'
+    )
+    
     return parser.parse_args()
 
 
@@ -231,19 +244,31 @@ def run_conversion(args, html_files, output_path: Path):
         else:
             current_output = output_path
         
-        # Convert
-        if fmt == 'pdf':
-            if args.method == 'playwright':
-                convert_to_pdf_playwright(html_files, str(current_output))
-            elif args.method == 'weasyprint':
-                convert_to_pdf_weasyprint(html_files, str(current_output))
-        else:  # ppt
-            if args.method == 'playwright':
-                convert_to_ppt_playwright(html_files, str(current_output))
-            elif args.method == 'weasyprint':
-                convert_to_ppt_weasyprint(html_files, str(current_output))
+        # Convert with parallel processing if enabled
+        if args.parallel and args.method == 'playwright':
+            from converters.parallel_converter import (
+                parallel_convert_to_pdf_playwright,
+                parallel_convert_to_ppt_playwright
+            )
+            
+            if fmt == 'pdf':
+                parallel_convert_to_pdf_playwright(html_files, str(current_output), args.workers, args.quiet)
+            else:  # ppt
+                parallel_convert_to_ppt_playwright(html_files, str(current_output), args.workers, args.quiet)
+        else:
+            # Standard sequential conversion
+            if fmt == 'pdf':
+                if args.method == 'playwright':
+                    convert_to_pdf_playwright(html_files, str(current_output))
+                elif args.method == 'weasyprint':
+                    convert_to_pdf_weasyprint(html_files, str(current_output))
+            else:  # ppt
+                if args.method == 'playwright':
+                    convert_to_ppt_playwright(html_files, str(current_output))
+                elif args.method == 'weasyprint':
+                    convert_to_ppt_weasyprint(html_files, str(current_output))
         
-        if not args.quiet:
+        if not args.quiet and not args.parallel:
             print(f"\n✓ {fmt.upper()} saved to: {current_output}")
 
 
