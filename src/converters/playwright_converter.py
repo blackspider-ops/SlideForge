@@ -47,9 +47,27 @@ def convert_to_pdf_playwright(html_files: List[Path], output_path: str, quiet: b
                     # Wait for document to be ready
                     page.evaluate("() => document.fonts.ready")
                     
+                    # Force content to fit in one page by setting max-height
+                    page.evaluate("""() => {
+                        const slide = document.querySelector('.slide');
+                        if (slide) {
+                            slide.style.height = '720px';
+                            slide.style.maxHeight = '720px';
+                            slide.style.overflow = 'hidden';
+                        }
+                        document.body.style.height = '720px';
+                        document.body.style.overflow = 'hidden';
+                    }""")
+                    
                     # Create temp PDF for this slide
                     temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
-                    page.pdf(path=temp_pdf.name, width='1280px', height='720px', print_background=True)
+                    page.pdf(
+                        path=temp_pdf.name, 
+                        width='1280px', 
+                        height='720px', 
+                        print_background=True,
+                        prefer_css_page_size=False
+                    )
                     pdf_files.append(temp_pdf.name)
                     
                 except Exception as e:
