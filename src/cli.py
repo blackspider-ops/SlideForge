@@ -25,9 +25,10 @@ Methods:
   2. weasyprint  - Pure Python, no browser needed
 
 Examples:
-  python converter.py --format pdf
-  python converter.py --format ppt
-  python converter.py --format pdf --method weasyprint --output my-slides.pdf
+  ./slideforge.sh --format pdf              # macOS/Linux
+  slideforge.bat --format ppt               # Windows
+  ./slideforge.sh --format pdf --method weasyprint --output my-slides.pdf
+  ./slideforge.sh --clean                   # Delete all slides (requires confirmation)
         """
     )
     
@@ -61,6 +62,12 @@ Examples:
         '--output-dir',
         help='Output directory (default: ../output)',
         default='../output'
+    )
+    
+    parser.add_argument(
+        '--clean',
+        action='store_true',
+        help='Delete all HTML files in slides directory (requires confirmation)'
     )
     
     return parser.parse_args()
@@ -152,17 +159,85 @@ def run_conversion(args, html_files, output_path: Path):
             convert_to_ppt_weasyprint(html_files, str(output_path))
 
 
+def clean_slides_directory(slides_dir: Path):
+    """Delete all HTML files in slides directory with double confirmation."""
+    if not slides_dir.exists():
+        print(f"Slides directory not found: {slides_dir}")
+        return
+    
+    html_files = get_html_files(str(slides_dir))
+    
+    if not html_files:
+        print(f"No HTML files found in {slides_dir}")
+        return
+    
+    print(f"\n{'='*60}")
+    print("⚠️  WARNING: DELETE ALL SLIDES")
+    print(f"{'='*60}")
+    print(f"\nThis will permanently delete {len(html_files)} HTML file(s) from:")
+    print(f"  {slides_dir}")
+    print("\nFiles to be deleted:")
+    for i, file in enumerate(html_files[:10], 1):  # Show first 10
+        print(f"  {i}. {file.name}")
+    if len(html_files) > 10:
+        print(f"  ... and {len(html_files) - 10} more files")
+    
+    print(f"\n{'='*60}")
+    response1 = input("Are you sure you want to delete ALL slides? (yes/no): ").strip().lower()
+    
+    if response1 != 'yes':
+        print("Operation cancelled.")
+        return
+    
+    print(f"\n{'='*60}")
+    print("⚠️  FINAL CONFIRMATION")
+    print(f"{'='*60}")
+    response2 = input(f"Type 'DELETE' to confirm deletion of {len(html_files)} files: ").strip()
+    
+    if response2 != 'DELETE':
+        print("Operation cancelled.")
+        return
+    
+    # Delete files
+    print(f"\n🗑️  Deleting {len(html_files)} HTML files...")
+    deleted_count = 0
+    failed_count = 0
+    
+    for html_file in html_files:
+        try:
+            html_file.unlink()
+            deleted_count += 1
+        except Exception as e:
+            print(f"  Failed to delete {html_file.name}: {e}")
+            failed_count += 1
+    
+    print(f"\n✓ Deleted {deleted_count} file(s)")
+    if failed_count > 0:
+        print(f"⚠ Failed to delete {failed_count} file(s)")
+    
+    print(f"\n{'='*60}")
+    print("Slides directory cleaned successfully!")
+    print(f"{'='*60}\n")
+
+
 def run_converter():
     """Main converter logic."""
     args = parse_arguments()
+    
+    # Get script directory
+    script_dir = Path(__file__).parent
+    slides_dir = (script_dir / args.slides_dir).resolve()
+    
+    # Handle clean command
+    if args.clean:
+        clean_slides_directory(slides_dir)
+        sys.exit(0)
     
     # Check and install dependencies if needed
     if not check_and_install_dependencies(args.method, args.format):
         sys.exit(1)
     
-    # Get script directory
-    script_dir = Path(__file__).parent
-    slides_dir = (script_dir / args.slides_dir).resolve()
+    # slides_dir already set above for clean command
     output_dir = (script_dir / args.output_dir).resolve()
     
     # Check if slides directory exists and has files

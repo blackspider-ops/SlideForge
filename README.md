@@ -19,23 +19,33 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 🏗️ **Modular Architecture** - Clean, maintainable, production-ready code
 - 🔢 **Smart Sorting** - Correctly orders slides numerically (page1, page2... page10)
 - 🖥️ **Cross-Platform** - Works on macOS, Linux, and Windows with simple launchers
+- 🗑️ **Clean Command** - Safely delete all slides with double confirmation for fresh start
 
 ## 🚀 Quick Start
+
+### macOS/Linux
 
 ```bash
 # Clone the repository
 git clone https://github.com/blackspider-ops/SlideForge.git
 cd SlideForge
 
+# Make the launcher executable (first time only)
+chmod +x slideforge.sh
+
 # Run SlideForge
-# macOS/Linux:
 ./slideforge.sh --format pdf
+```
 
-# Windows:
+### Windows
+
+```cmd
+# Clone the repository
+git clone https://github.com/blackspider-ops/SlideForge.git
+cd SlideForge
+
+# Run SlideForge (no setup needed)
 slideforge.bat --format pdf
-
-# Or use Python directly (works everywhere):
-python slideforge.py --format pdf
 ```
 
 That's it! The launcher will:
@@ -44,17 +54,31 @@ That's it! The launcher will:
 - ✅ Install dependencies if needed
 - ✅ Run the converter
 
-### Alternative: Direct Usage
+### Troubleshooting First Run
+
+**macOS/Linux - Permission Denied:**
+```bash
+# If you get "Permission denied" error
+chmod +x slideforge.sh
+./slideforge.sh --format pdf
+```
+
+**Windows - Script Execution Policy:**
+```powershell
+# If you get execution policy error in PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+slideforge.bat --format pdf
+```
+
+### Advanced: Direct Python Usage
 
 ```bash
-# Navigate to src folder
+# If you prefer to use Python directly
+python src/main.py --format pdf
+
+# Or activate venv and use converter directly
 cd src
-
-# Create virtual environment
-python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Run the converter
 python converter.py --format pdf
 ```
 
@@ -72,6 +96,9 @@ python converter.py --format pdf
 
 # Use WeasyPrint method
 ./slideforge.sh --format pdf --method weasyprint
+
+# Clean slides directory (delete all HTML files)
+./slideforge.sh --clean
 ```
 
 **Windows:**
@@ -84,13 +111,12 @@ slideforge.bat --format ppt
 
 # Use WeasyPrint method
 slideforge.bat --format pdf --method weasyprint
+
+# Clean slides directory (delete all HTML files)
+slideforge.bat --clean
 ```
 
-**Cross-platform (Python):**
-```bash
-python slideforge.py --format pdf
-python slideforge.py --format ppt
-```
+
 
 ### Custom Output
 
@@ -182,11 +208,12 @@ brew install poppler  # macOS only, for PPT conversion
 
 ```
 slideforge/
+├── slideforge.sh                 # macOS/Linux launcher
+├── slideforge.bat                # Windows launcher
 ├── src/
-│   ├── converter.py              # Entry point
+│   ├── main.py                   # Main launcher script
+│   ├── converter.py              # Converter entry point
 │   ├── cli.py                    # CLI logic
-│   ├── requirements.txt          # Dependencies
-│   ├── README.md                 # Documentation
 │   ├── converters/               # Conversion methods
 │   │   ├── playwright_converter.py
 │   │   └── weasyprint_converter.py
@@ -195,7 +222,10 @@ slideforge/
 │       └── file_utils.py
 ├── slides/                       # HTML slides (auto-created)
 ├── output/                       # Converted files (auto-created)
+├── requirements.txt              # Python dependencies
 ├── LICENSE
+├── CHANGELOG.md
+├── CONTRIBUTING.md
 └── README.md                     # This file
 ```
 

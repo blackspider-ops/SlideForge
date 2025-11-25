@@ -146,16 +146,101 @@ def get_activation_command():
         return 'source src/venv/bin/activate'
 
 
+def clean_slides_directory(slides_dir: str):
+    """Delete all HTML files in slides directory with double confirmation."""
+    from pathlib import Path
+    import glob
+    
+    slides_path = Path(slides_dir)
+    
+    if not slides_path.exists():
+        print(f"Slides directory not found: {slides_path}")
+        return
+    
+    # Get HTML files
+    pattern = str(slides_path / "*.html")
+    html_files = sorted(glob.glob(pattern))
+    
+    if not html_files:
+        print(f"No HTML files found in {slides_path}")
+        return
+    
+    print(f"\n{'='*60}")
+    print("⚠️  WARNING: DELETE ALL SLIDES")
+    print(f"{'='*60}")
+    print(f"\nThis will permanently delete {len(html_files)} HTML file(s) from:")
+    print(f"  {slides_path}")
+    print("\nFiles to be deleted:")
+    for i, file in enumerate(html_files[:10], 1):  # Show first 10
+        print(f"  {i}. {Path(file).name}")
+    if len(html_files) > 10:
+        print(f"  ... and {len(html_files) - 10} more files")
+    
+    print(f"\n{'='*60}")
+    response1 = input("Are you sure you want to delete ALL slides? (yes/no): ").strip().lower()
+    
+    if response1 != 'yes':
+        print("Operation cancelled.")
+        return
+    
+    print(f"\n{'='*60}")
+    print("⚠️  FINAL CONFIRMATION")
+    print(f"{'='*60}")
+    response2 = input(f"Type 'DELETE' to confirm deletion of {len(html_files)} files: ").strip()
+    
+    if response2 != 'DELETE':
+        print("Operation cancelled.")
+        return
+    
+    # Delete files
+    print(f"\n🗑️  Deleting {len(html_files)} HTML files...")
+    deleted_count = 0
+    failed_count = 0
+    
+    for html_file in html_files:
+        try:
+            Path(html_file).unlink()
+            deleted_count += 1
+        except Exception as e:
+            print(f"  Failed to delete {Path(html_file).name}: {e}")
+            failed_count += 1
+    
+    print(f"\n✓ Deleted {deleted_count} file(s)")
+    if failed_count > 0:
+        print(f"⚠ Failed to delete {failed_count} file(s)")
+    
+    print(f"\n{'='*60}")
+    print("Slides directory cleaned successfully!")
+    print(f"{'='*60}\n")
+
+
 def run_converter(args):
     """Run the converter with provided arguments."""
+    # Check if --clean flag is present
+    if '--clean' in args:
+        # Get slides directory from args or use default
+        slides_dir = '../slides'
+        if '--slides-dir' in args:
+            idx = args.index('--slides-dir')
+            if idx + 1 < len(args):
+                slides_dir = args[idx + 1]
+        
+        # Resolve path relative to main.py location
+        script_dir = Path(__file__).parent
+        slides_path = (script_dir / slides_dir).resolve()
+        
+        clean_slides_directory(str(slides_path))
+        return
+    
     venv_python = get_venv_python()
     
     if not venv_python.exists():
         print("❌ Virtual environment Python not found")
         sys.exit(1)
     
-    # Build command
-    cmd = [str(venv_python), 'src/converter.py'] + args
+    # Build command - converter.py is in same directory as main.py
+    converter_path = Path(__file__).parent / 'converter.py'
+    cmd = [str(venv_python), str(converter_path)] + args
     
     print(f"\n{'='*60}")
     print("Running SlideForge...")
@@ -173,13 +258,20 @@ def run_converter(args):
 
 def show_usage():
     """Show usage information."""
+    system = platform.system()
+    
+    if system == 'Windows':
+        cmd = 'slideforge.bat'
+    else:
+        cmd = './slideforge.sh'
+    
     print("\n📖 Usage:")
-    print("  python slideforge.py --format pdf")
-    print("  python slideforge.py --format ppt")
-    print("  python slideforge.py --format pdf --method weasyprint")
-    print("  python slideforge.py --format ppt -o presentation")
+    print(f"  {cmd} --format pdf")
+    print(f"  {cmd} --format ppt")
+    print(f"  {cmd} --format pdf --method weasyprint")
+    print(f"  {cmd} --format ppt -o presentation")
     print("\n📚 For more options:")
-    print("  python slideforge.py --help")
+    print(f"  {cmd} --help")
     print()
 
 

@@ -36,10 +36,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 30-second timeout per slide
 - Keyboard interrupt handling
 
+## [1.2.0] - 2024-11-24
+
+### Added
+- `--clean` command to delete all slides with double confirmation
+- OS-aware usage messages (shows correct command for Windows/Mac/Linux)
+- chmod instructions in README for macOS/Linux users
+
+### Changed
+- Renamed `slideforge.py` to `src/main.py` for better organization
+- Updated all launchers to use `src/main.py`
+- Simplified Quick Start guide with platform-specific instructions
+- Updated project structure documentation
+- All examples now use `.sh` or `.bat` files instead of Python directly
+
+### Improved
+- Better project organization with main.py in src folder
+- Clearer documentation for first-time users
+- More intuitive command structure
+
 ## [1.1.0] - 2024-11-24
 
 ### Added
-- Cross-platform launcher scripts (slideforge.sh, slideforge.bat, slideforge.py)
+- Cross-platform launcher scripts (slideforge.sh, slideforge.bat)
 - Automatic virtual environment creation
 - Automatic dependency installation
 - venv module detection and installation (Linux)

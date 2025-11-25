@@ -1,3 +1,3 @@
 @echo off
 REM SlideForge launcher for Windows
-python slideforge.py %*
+python src\main.py %*
