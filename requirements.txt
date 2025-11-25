@@ -10,5 +10,9 @@ playwright>=1.40.0
 weasyprint>=60.0
 pdf2image>=1.16.0
 
+# Optional: Progress bar and watch mode
+tqdm>=4.66.0
+watchdog>=3.0.0
+
 # Note: After installing playwright, run:
 # playwright install chromium

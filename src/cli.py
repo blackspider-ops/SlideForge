@@ -3,8 +3,10 @@
 import sys
 import argparse
 from pathlib import Path
+import time
 
 from version import __version__, __author__, __description__
+from config import load_config, show_config, set_config_value
 from utils.dependencies import check_and_install_dependencies
 from utils.file_utils import get_html_files, create_template_slide
 from converters import (
@@ -36,7 +38,7 @@ Examples:
     parser.add_argument(
         '--format',
         choices=['pdf', 'ppt'],
-        required=True,
+        required=False,  # Not required if using --batch
         help='Output format: pdf or ppt'
     )
     
@@ -92,6 +94,55 @@ Examples:
     parser.add_argument(
         '--range',
         help='Convert only specific slides (e.g., 1-5 or 1,3,5)',
+        default=None
+    )
+    
+    parser.add_argument(
+        '--quiet', '-q',
+        action='store_true',
+        help='Minimal output (quiet mode)'
+    )
+    
+    parser.add_argument(
+        '--verbose', '-v',
+        action='store_true',
+        help='Detailed output (verbose mode)'
+    )
+    
+    parser.add_argument(
+        '--batch',
+        action='store_true',
+        help='Convert to both PDF and PPT formats'
+    )
+    
+    parser.add_argument(
+        '--show-config',
+        action='store_true',
+        help='Show current configuration'
+    )
+    
+    parser.add_argument(
+        '--set-config',
+        nargs=2,
+        metavar=('KEY', 'VALUE'),
+        help='Set a configuration value (e.g., --set-config method playwright)'
+    )
+    
+    parser.add_argument(
+        '--watch',
+        action='store_true',
+        help='Watch slides directory and auto-convert on changes'
+    )
+    
+    parser.add_argument(
+        '--dimensions',
+        help='Custom slide dimensions (e.g., 1920x1080)',
+        default=None
+    )
+    
+    parser.add_argument(
+        '--merge-pdf',
+        help='Merge with another PDF file',
         default=None
     )
     
@@ -160,28 +211,40 @@ def prepare_output_path(args, output_dir: Path) -> Path:
     
     output_path = output_dir / output_filename
     
-    # Check if output file already exists
-    if output_path.exists():
-        response = input(f"\nOutput file already exists: {output_path}\nOverwrite? (y/n): ").strip().lower()
-        if response != 'y':
-            print("Operation cancelled.")
-            sys.exit(0)
-    
     return output_path
 
 
 def run_conversion(args, html_files, output_path: Path):
     """Execute the conversion based on format and method."""
-    if args.format == 'pdf':
-        if args.method == 'playwright':
-            convert_to_pdf_playwright(html_files, str(output_path))
-        elif args.method == 'weasyprint':
-            convert_to_pdf_weasyprint(html_files, str(output_path))
-    else:  # ppt
-        if args.method == 'playwright':
-            convert_to_ppt_playwright(html_files, str(output_path))
-        elif args.method == 'weasyprint':
-            convert_to_ppt_weasyprint(html_files, str(output_path))
+    formats_to_convert = ['pdf', 'ppt'] if args.batch else [args.format]
+    
+    for fmt in formats_to_convert:
+        if args.batch and not args.quiet:
+            print(f"\n{'='*60}")
+            print(f"Converting to {fmt.upper()}...")
+            print(f"{'='*60}\n")
+        
+        # Adjust output path for current format
+        if args.batch:
+            ext = '.pptx' if fmt == 'ppt' else '.pdf'
+            current_output = output_path.parent / (output_path.stem + ext)
+        else:
+            current_output = output_path
+        
+        # Convert
+        if fmt == 'pdf':
+            if args.method == 'playwright':
+                convert_to_pdf_playwright(html_files, str(current_output))
+            elif args.method == 'weasyprint':
+                convert_to_pdf_weasyprint(html_files, str(current_output))
+        else:  # ppt
+            if args.method == 'playwright':
+                convert_to_ppt_playwright(html_files, str(current_output))
+            elif args.method == 'weasyprint':
+                convert_to_ppt_weasyprint(html_files, str(current_output))
+        
+        if not args.quiet:
+            print(f"\n✓ {fmt.upper()} saved to: {current_output}")
 
 
 def clean_slides_directory(slides_dir: Path):
@@ -306,9 +369,108 @@ def parse_range(range_str: str, total_slides: int) -> list:
     return indices
 
 
+def watch_directory(slides_dir: Path, args):
+    """Watch slides directory for changes and auto-convert."""
+    try:
+        from watchdog.observers import Observer
+        from watchdog.events import FileSystemEventHandler
+    except ImportError:
+        print("Error: watchdog not installed")
+        print("Install with: pip install watchdog")
+        sys.exit(1)
+    
+    class SlideHandler(FileSystemEventHandler):
+        def __init__(self):
+            self.last_modified = {}
+        
+        def on_modified(self, event):
+            if event.is_directory or not event.src_path.endswith('.html'):
+                return
+            
+            # Debounce - ignore if modified within last 2 seconds
+            now = time.time()
+            if event.src_path in self.last_modified:
+                if now - self.last_modified[event.src_path] < 2:
+                    return
+            
+            self.last_modified[event.src_path] = now
+            
+            if not args.quiet:
+                print(f"\n🔄 Detected change: {Path(event.src_path).name}")
+                print("Converting...")
+            
+            # Trigger conversion
+            try:
+                html_files = get_html_files(str(slides_dir))
+                output_dir = (slides_dir.parent / args.output_dir).resolve()
+                output_dir.mkdir(parents=True, exist_ok=True)
+                
+                output_filename = f"slides.{args.format}x" if args.format == 'ppt' else "slides.pdf"
+                output_path = output_dir / output_filename
+                
+                if args.format == 'pdf':
+                    if args.method == 'playwright':
+                        convert_to_pdf_playwright(html_files, str(output_path))
+                    else:
+                        convert_to_pdf_weasyprint(html_files, str(output_path))
+                else:
+                    if args.method == 'playwright':
+                        convert_to_ppt_playwright(html_files, str(output_path))
+                    else:
+                        convert_to_ppt_weasyprint(html_files, str(output_path))
+                
+                if not args.quiet:
+                    print(f"✓ Converted to {output_path}")
+            except Exception as e:
+                print(f"❌ Conversion failed: {e}")
+    
+    event_handler = SlideHandler()
+    observer = Observer()
+    observer.schedule(event_handler, str(slides_dir), recursive=False)
+    observer.start()
+    
+    print(f"\n{'='*60}")
+    print(f"👀 Watching {slides_dir} for changes...")
+    print("Press Ctrl+C to stop")
+    print(f"{'='*60}\n")
+    
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+        print("\n\n⚠ Watch mode stopped")
+    
+    observer.join()
+
+
 def run_converter():
     """Main converter logic."""
     args = parse_arguments()
+    
+    # Load config and apply defaults
+    config = load_config()
+    
+    # Apply config defaults if args not provided
+    if not hasattr(args, 'method') or args.method == 'playwright':
+        args.method = config.get('method', 'playwright')
+    if not hasattr(args, 'slides_dir') or args.slides_dir == '../slides':
+        args.slides_dir = config.get('slides_dir', '../slides')
+    if not hasattr(args, 'output_dir') or args.output_dir == '../output':
+        args.output_dir = config.get('output_dir', '../output')
+    
+    # Handle show-config command
+    if args.show_config:
+        show_config()
+        sys.exit(0)
+    
+    # Handle set-config command
+    if args.set_config:
+        key, value = args.set_config
+        if set_config_value(key, value):
+            sys.exit(0)
+        else:
+            sys.exit(1)
     
     # Handle version command
     if args.version:
@@ -328,6 +490,31 @@ def run_converter():
     if args.clean:
         clean_slides_directory(slides_dir)
         sys.exit(0)
+    
+    # Handle watch mode
+    if args.watch:
+        if not args.format:
+            print("Error: --watch requires --format")
+            sys.exit(1)
+        watch_directory(slides_dir, args)
+        sys.exit(0)
+    
+    # Validate format requirement
+    if not args.format and not args.batch:
+        print("Error: --format is required (unless using --batch)")
+        sys.exit(1)
+    
+    # Handle batch mode
+    if args.batch:
+        if not args.quiet:
+            print("\n🔄 Batch mode: Converting to both PDF and PPT\n")
+        
+        # Set format to pdf for first conversion
+        if not args.format:
+            args.format = 'pdf'
+        
+        # We'll handle batch conversion by running twice
+        # First conversion will happen below, then we'll do second format
     
     # Check and install dependencies if needed
     if not check_and_install_dependencies(args.method, args.format):

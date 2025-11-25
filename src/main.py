@@ -217,6 +217,7 @@ def clean_slides_directory(slides_dir: str):
 def run_converter(args):
     """Run the converter with provided arguments."""
     from version import __version__, __author__, __description__
+    from config import show_config, set_config_value
     
     # Check if --version flag is present
     if '--version' in args:
@@ -224,6 +225,23 @@ def run_converter(args):
         print(f"{__description__}")
         print(f"Author: {__author__}")
         print(f"GitHub: https://github.com/blackspider-ops/SlideForge\n")
+        return
+    
+    # Check if --show-config flag is present
+    if '--show-config' in args:
+        show_config()
+        return
+    
+    # Check if --set-config flag is present
+    if '--set-config' in args:
+        idx = args.index('--set-config')
+        if idx + 2 < len(args):
+            key = args[idx + 1]
+            value = args[idx + 2]
+            if set_config_value(key, value):
+                return
+        else:
+            print("Error: --set-config requires KEY and VALUE")
         return
     
     # Check if --list flag is present

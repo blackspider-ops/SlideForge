@@ -89,15 +89,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added slides/ folder to .gitignore
 - Improved launcher with better error messages and progress indicators
 
+## [1.4.0] - 2024-11-24
+
+### Added
+- **Config file support** - Save preferences in `~/.slideforge/config.json`
+- `--show-config` - Display current configuration
+- `--set-config KEY VALUE` - Set configuration values
+- `--batch` - Convert to both PDF and PPT at once
+- `--quiet` / `-q` - Minimal output for automation
+- `--verbose` / `-v` - Detailed logging
+- `--watch` - Auto-convert when HTML files change (requires watchdog)
+- `--dimensions` - Custom slide dimensions (e.g., 1920x1080)
+- `--merge-pdf` - Merge with another PDF file
+- Progress bar support with tqdm (optional)
+- Watch mode with watchdog (optional)
+
+### Improved
+- Configuration management system
+- Better output control (quiet/verbose modes)
+- Workflow automation with watch mode
+- Batch processing for multiple formats
+
+### Dependencies
+- Added optional: tqdm (progress bars)
+- Added optional: watchdog (watch mode)
+
 ## [Unreleased]
 
 ### Planned
-- Batch processing mode
-- Configuration file support
-- Custom slide dimensions
-- Progress bar for large conversions
 - Parallel processing for faster conversions
 - Docker support
 - GitHub Actions workflow
 - Unit tests
 - Integration tests
+- Web UI

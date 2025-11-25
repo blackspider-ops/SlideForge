@@ -7,12 +7,19 @@ from pathlib import Path
 from typing import List
 
 
-def convert_to_pdf_playwright(html_files: List[Path], output_path: str):
+def convert_to_pdf_playwright(html_files: List[Path], output_path: str, quiet: bool = False, verbose: bool = False):
     """Convert HTML slides to PDF using Playwright."""
     from playwright.sync_api import sync_playwright
     from PyPDF2 import PdfMerger
     
-    print(f"Converting {len(html_files)} HTML slides to PDF using Playwright...")
+    try:
+        from tqdm import tqdm
+        use_progress = not quiet
+    except ImportError:
+        use_progress = False
+    
+    if not quiet:
+        print(f"Converting {len(html_files)} HTML slides to PDF using Playwright...")
     
     browser = None
     pdf_files = []

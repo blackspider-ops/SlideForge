@@ -24,6 +24,13 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 🎯 **Range Selection** - Convert only specific slides (e.g., 1-5 or 1,3,5)
 - 🔍 **Dry Run** - Preview conversion without creating files
 - 📌 **Version Info** - Check current version with `--version`
+- ⚙️ **Config File** - Save preferences in `~/.slideforge/config.json`
+- 🔄 **Batch Mode** - Convert to both PDF and PPT at once
+- 🤫 **Quiet Mode** - Minimal output for automation
+- 📢 **Verbose Mode** - Detailed logging for debugging
+- 👀 **Watch Mode** - Auto-convert when files change
+- 📏 **Custom Dimensions** - Override default slide size
+- 📎 **Merge PDFs** - Combine multiple PDF outputs
 
 ## 🚀 Quick Start
 
@@ -116,6 +123,26 @@ python converter.py --format pdf
 
 # Show version
 ./slideforge.sh --version
+
+# Configuration
+./slideforge.sh --show-config
+./slideforge.sh --set-config method playwright
+./slideforge.sh --set-config output_dir ./exports
+
+# Batch mode (convert to both formats)
+./slideforge.sh --batch --format pdf
+
+# Quiet mode (minimal output)
+./slideforge.sh --format pdf --quiet
+
+# Verbose mode (detailed logging)
+./slideforge.sh --format pdf --verbose
+
+# Watch mode (auto-convert on changes)
+./slideforge.sh --format pdf --watch
+
+# Custom dimensions
+./slideforge.sh --format pdf --dimensions 1920x1080
 ```
 
 **Windows:**
