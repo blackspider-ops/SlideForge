@@ -256,15 +256,40 @@ brew install poppler  # macOS only, for PPT conversion
 
 **Recommendation:** Use Playwright for production-quality conversions.
 
+## 📐 HTML Slide Guidelines
+
+**Important:** For best results, your HTML slides should fit within **1280x720px** dimensions.
+
+### Quick Tips
+
+1. **Use fixed height** - Set `.slide { height: 720px; }` not `min-height`
+2. **Keep padding moderate** - Header: ~35px top, Content: ~25px bottom
+3. **Use appropriate font sizes** - Title: 36-40px, Body: 16-18px
+4. **Test problematic slides** - Use `--range` flag to test specific slides
+
+### Common Issues
+
+**Content cut off at bottom?**
+- Reduce header/content padding
+- Decrease font sizes slightly
+- Reduce margins between elements
+
+**Slide spans multiple pages?**
+- Total content height exceeds 720px
+- See [FORMAT.md](FORMAT.md) for detailed fixes
+
+📖 **See [FORMAT.md](FORMAT.md) for complete HTML formatting guidelines and troubleshooting**
+
 ## Tips for Best Results
 
 1. **Use Playwright** for production-quality conversions
-2. **Test with one slide first** before converting large presentations
-3. **Keep HTML files simple** for better compatibility
-4. **Use web-safe fonts** or include font files locally
-5. **Optimize images** in HTML for faster processing
-6. **Check output** after conversion to ensure quality
-7. **Use templates** as starting points for consistent styling
+2. **Follow HTML guidelines** in [FORMAT.md](FORMAT.md) to avoid layout issues
+3. **Test with one slide first** before converting large presentations
+4. **Keep HTML files simple** for better compatibility
+5. **Use web-safe fonts** or include font files locally
+6. **Optimize images** in HTML for faster processing
+7. **Check output** after conversion to ensure quality
+8. **Use templates** as starting points for consistent styling
 
 
 ## 🏗️ Project Structure
