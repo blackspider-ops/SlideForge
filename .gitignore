@@ -42,6 +42,9 @@ output/
 *.pdf
 *.pptx
 
+# Slides folder (user content)
+slides/
+
 # Temporary files
 *.tmp
 temp/

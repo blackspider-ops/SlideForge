@@ -36,6 +36,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 30-second timeout per slide
 - Keyboard interrupt handling
 
+## [1.1.0] - 2024-11-24
+
+### Added
+- Cross-platform launcher scripts (slideforge.sh, slideforge.bat, slideforge.py)
+- Automatic virtual environment creation
+- Automatic dependency installation
+- venv module detection and installation (Linux)
+- Natural sorting for HTML files (fixes page1, page10, page2 issue)
+
+### Fixed
+- File sorting now works numerically (page1, page2, ... page9, page10)
+- Virtual environment Python verification before installing dependencies
+- Requirements.txt path detection (checks root and src folders)
+
+### Changed
+- Moved requirements.txt to project root (standard convention)
+- Added slides/ folder to .gitignore
+- Improved launcher with better error messages and progress indicators
+
 ## [Unreleased]
 
 ### Planned

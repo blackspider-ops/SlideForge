@@ -7,10 +7,24 @@ from typing import List
 
 
 def get_html_files(slides_dir: str) -> List[Path]:
-    """Get all HTML files from slides directory, sorted by name."""
+    """Get all HTML files from slides directory, sorted numerically."""
+    import re
+    
     pattern = os.path.join(slides_dir, "*.html")
-    files = sorted(glob.glob(pattern))
-    return [Path(f) for f in files]
+    files = glob.glob(pattern)
+    
+    def natural_sort_key(path):
+        """Extract numbers from filename for natural sorting."""
+        # Extract all numbers from the filename
+        numbers = re.findall(r'\d+', os.path.basename(path))
+        if numbers:
+            # Convert first number to int for proper sorting
+            return (int(numbers[0]), path)
+        return (float('inf'), path)  # Files without numbers go last
+    
+    # Sort naturally (page1, page2, ... page9, page10)
+    files_sorted = sorted(files, key=natural_sort_key)
+    return [Path(f) for f in files_sorted]
 
 
 def create_template_slide(file_path: Path, slide_number: int):

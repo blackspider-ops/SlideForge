@@ -17,6 +17,8 @@ Forge your HTML slides into PowerPoint or PDF with perfect styling preservation.
 - 📦 **Auto Extensions** - Automatically adds .pdf or .pptx extensions
 - ⚠️ **Overwrite Protection** - Asks before overwriting existing files
 - 🏗️ **Modular Architecture** - Clean, maintainable, production-ready code
+- 🔢 **Smart Sorting** - Correctly orders slides numerically (page1, page2... page10)
+- 🖥️ **Cross-Platform** - Works on macOS, Linux, and Windows with simple launchers
 
 ## 🚀 Quick Start
 

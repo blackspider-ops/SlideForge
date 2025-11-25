@@ -9,3 +9,6 @@ playwright>=1.40.0
 # Method 2: WeasyPrint (pure Python, no browser needed)
 weasyprint>=60.0
 pdf2image>=1.16.0
+
+# Note: After installing playwright, run:
+# playwright install chromium
