@@ -28,22 +28,31 @@ Methods:
   2. weasyprint  - Pure Python, no browser needed
 
 Examples:
-  ./slideforge.sh --format pdf              # macOS/Linux
-  slideforge.bat --format ppt               # Windows
-  ./slideforge.sh --format pdf --method weasyprint --output my-slides.pdf
-  ./slideforge.sh --clean                   # Delete all slides (requires confirmation)
+  ./slideforge.sh pdf                       # Smart format detection
+  ./slideforge.sh ppt                       # Smart format detection
+  ./slideforge.sh --format pdf              # Explicit format
+  ./slideforge.sh -f pdf -m weasyprint      # Short aliases
+  ./slideforge.sh pdf -o my-slides          # Combined
+  ./slideforge.sh --clean                   # Delete all slides
         """
     )
     
     parser.add_argument(
-        '--format',
+        'format_arg',
+        nargs='?',
         choices=['pdf', 'ppt'],
-        required=False,  # Not required if using --batch
+        help='Output format: pdf or ppt (can be used without --format)'
+    )
+    
+    parser.add_argument(
+        '--format', '-f',
+        choices=['pdf', 'ppt'],
+        required=False,
         help='Output format: pdf or ppt'
     )
     
     parser.add_argument(
-        '--method',
+        '--method', '-m',
         choices=['playwright', 'weasyprint'],
         default='playwright',
         help='Conversion method (default: playwright)'
@@ -56,43 +65,43 @@ Examples:
     )
     
     parser.add_argument(
-        '--slides-dir',
+        '--slides-dir', '-s',
         help='Directory containing HTML slides (default: ../slides)',
         default='../slides'
     )
     
     parser.add_argument(
-        '--output-dir',
+        '--output-dir', '-d',
         help='Output directory (default: ../output)',
         default='../output'
     )
     
     parser.add_argument(
-        '--clean',
+        '--clean', '-c',
         action='store_true',
         help='Delete all HTML files in slides directory (requires confirmation)'
     )
     
     parser.add_argument(
-        '--list',
+        '--list', '-l',
         action='store_true',
         help='List all HTML slides in the slides directory'
     )
     
     parser.add_argument(
-        '--dry-run',
+        '--dry-run', '-n',
         action='store_true',
         help='Show what would be converted without actually converting'
     )
     
     parser.add_argument(
-        '--version',
+        '--version', '-V',
         action='store_true',
         help='Show version information'
     )
     
     parser.add_argument(
-        '--range',
+        '--range', '-r',
         help='Convert only specific slides (e.g., 1-5 or 1,3,5)',
         default=None
     )
@@ -110,7 +119,7 @@ Examples:
     )
     
     parser.add_argument(
-        '--batch',
+        '--batch', '-b',
         action='store_true',
         help='Convert to both PDF and PPT formats'
     )
@@ -129,7 +138,7 @@ Examples:
     )
     
     parser.add_argument(
-        '--watch',
+        '--watch', '-w',
         action='store_true',
         help='Watch slides directory and auto-convert on changes'
     )
@@ -147,9 +156,9 @@ Examples:
     )
     
     parser.add_argument(
-        '--parallel',
+        '--parallel', '-p',
         action='store_true',
-        help='Use parallel processing for faster conversion (experimental)'
+        help='Use parallel processing for faster conversion'
     )
     
     parser.add_argument(
@@ -472,6 +481,10 @@ def watch_directory(slides_dir: Path, args):
 def run_converter():
     """Main converter logic."""
     args = parse_arguments()
+    
+    # Smart format detection - use positional arg if provided
+    if args.format_arg:
+        args.format = args.format_arg
     
     # Load config and apply defaults
     config = load_config()

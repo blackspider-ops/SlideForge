@@ -132,6 +132,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Up to 4x faster conversion with 4 workers
 - Scales with number of CPU cores
 
+## [1.5.1] - 2024-11-24
+
+### Added
+- **Smart format detection** - Just type `pdf` or `ppt` without `--format`
+- **Short aliases** for all commands:
+  - `-f` for `--format`
+  - `-m` for `--method`
+  - `-o` for `--output`
+  - `-s` for `--slides-dir`
+  - `-d` for `--output-dir`
+  - `-l` for `--list`
+  - `-c` for `--clean`
+  - `-n` for `--dry-run`
+  - `-V` for `--version`
+  - `-r` for `--range`
+  - `-q` for `--quiet`
+  - `-v` for `--verbose`
+  - `-b` for `--batch`
+  - `-w` for `--watch`
+  - `-p` for `--parallel`
+
+### Improved
+- Simpler command syntax
+- Faster typing with short aliases
+- More intuitive usage
+
 ## [Unreleased]
 
 ### Planned

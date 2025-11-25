@@ -101,82 +101,77 @@ python converter.py --format pdf
 
 **macOS/Linux:**
 ```bash
-# Convert to PDF (uses Playwright by default)
-./slideforge.sh --format pdf
+# Smart format detection (NEW in v1.5.1!)
+./slideforge.sh pdf                       # Convert to PDF
+./slideforge.sh ppt                       # Convert to PowerPoint
 
-# Convert to PowerPoint
+# Short aliases (NEW in v1.5.1!)
+./slideforge.sh pdf -m weasyprint         # Use WeasyPrint
+./slideforge.sh ppt -o presentation       # Custom output
+./slideforge.sh pdf -r 1-5                # Range selection
+./slideforge.sh pdf -p -w 8               # Parallel with 8 workers
+
+# Traditional syntax (still works)
+./slideforge.sh --format pdf
 ./slideforge.sh --format ppt
 
-# Use WeasyPrint method
-./slideforge.sh --format pdf --method weasyprint
-
 # List all slides
-./slideforge.sh --list
+./slideforge.sh --list                    # or -l
 
 # Dry run (preview without converting)
-./slideforge.sh --format pdf --dry-run
+./slideforge.sh pdf --dry-run             # or -n
 
 # Convert specific slides only
-./slideforge.sh --format pdf --range 1-5
-./slideforge.sh --format ppt --range 1,3,5,7
+./slideforge.sh pdf --range 1-5           # or -r 1-5
+./slideforge.sh ppt -r 1,3,5,7
 
-# Clean slides directory (delete all HTML files)
-./slideforge.sh --clean
+# Clean slides directory
+./slideforge.sh --clean                   # or -c
 
 # Show version
-./slideforge.sh --version
+./slideforge.sh --version                 # or -V
 
 # Configuration
 ./slideforge.sh --show-config
 ./slideforge.sh --set-config method playwright
-./slideforge.sh --set-config output_dir ./exports
 
 # Batch mode (convert to both formats)
-./slideforge.sh --batch --format pdf
+./slideforge.sh --batch                   # or -b
 
 # Quiet mode (minimal output)
-./slideforge.sh --format pdf --quiet
+./slideforge.sh pdf --quiet               # or -q
 
 # Verbose mode (detailed logging)
-./slideforge.sh --format pdf --verbose
+./slideforge.sh pdf --verbose             # or -v
 
 # Watch mode (auto-convert on changes)
-./slideforge.sh --format pdf --watch
+./slideforge.sh pdf --watch               # or -w
 
-# Custom dimensions
-./slideforge.sh --format pdf --dimensions 1920x1080
-
-# Parallel processing (faster for many slides)
-./slideforge.sh --format pdf --parallel
-./slideforge.sh --format pdf --parallel --workers 8
+# Parallel processing (faster)
+./slideforge.sh pdf --parallel            # or -p
+./slideforge.sh pdf -p --workers 8
 ```
 
 **Windows:**
 ```cmd
-# Convert to PDF (uses Playwright by default)
-slideforge.bat --format pdf
+# Smart format detection (NEW in v1.5.1!)
+slideforge.bat pdf                        # Convert to PDF
+slideforge.bat ppt                        # Convert to PowerPoint
 
-# Convert to PowerPoint
+# Short aliases (NEW in v1.5.1!)
+slideforge.bat pdf -m weasyprint          # Use WeasyPrint
+slideforge.bat ppt -o presentation        # Custom output
+slideforge.bat pdf -r 1-5                 # Range selection
+
+# Traditional syntax (still works)
+slideforge.bat --format pdf
 slideforge.bat --format ppt
 
-# Use WeasyPrint method
-slideforge.bat --format pdf --method weasyprint
-
-# List all slides
-slideforge.bat --list
-
-# Dry run (preview without converting)
-slideforge.bat --format pdf --dry-run
-
-# Convert specific slides only
-slideforge.bat --format pdf --range 1-5
-slideforge.bat --format ppt --range 1,3,5,7
-
-# Clean slides directory (delete all HTML files)
-slideforge.bat --clean
-
-# Show version
-slideforge.bat --version
+# All other commands work the same as macOS/Linux
+slideforge.bat --list                     # or -l
+slideforge.bat pdf --dry-run              # or -n
+slideforge.bat --clean                    # or -c
+slideforge.bat --version                  # or -V
 ```
 
 
